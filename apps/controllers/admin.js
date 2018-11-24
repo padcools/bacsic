@@ -2,11 +2,23 @@ var express = require("express");
 var router = express.Router();
 
 var user_md = require("../models/users");
+var post_md = require("../models/post");
 
 var helper = require("../helpers/helper");
 
 router.get("/", function(req, res){
-    res.json({"message": "This is Admin Page"});
+    //res.json({"message": "This is Admin Page"});
+    var data = post_md.getAllPost();
+    data.then(function(posts){
+        var data = {
+            posts: posts,
+            error: false
+        };
+        res.render("admin/dashboard", {data: data});
+    }).catch(function(err)
+    {
+        res.render("admin/dashboard", {data: {error: "Get Post is Error"}});
+    })
 });
 
 router.get("/signup", function(req, res){
@@ -25,9 +37,11 @@ router.post("/signup", function(req, res){
     }
     
     //inser to DB Hash Pass
+    
     var password = helper.hash_password(user.passwd);
+    var email = helper.hash_email(user.email)
     user = {
-        email: user.email,
+        email: email,
         password: password,
         first_name: user.firstname,
         last_name: user.lastname
