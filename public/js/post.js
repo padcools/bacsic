@@ -1,7 +1,7 @@
 function Post(){
     function bindEvent(){
         $(".post_edit").click(function(e){
-            var parmars = {
+            var params = {
                 id: $(".id").val(),
                 title: $(".title").val(),
                 content: tinymce.get("content").getContent(),
