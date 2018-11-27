@@ -39,7 +39,7 @@ router.post("/signup", function(req, res){
     //inser to DB Hash Pass
     
     var password = helper.hash_password(user.passwd);
-    //var email = helper.hash_email(user.email)
+    var email = helper.hash_email(user.email)
     user = {
         email: email,
         password: password,
@@ -89,5 +89,77 @@ router.post("/signin", function(req, res){
 router.get("/post/new", function(req, res){
     res.render("admin/post/new", {data: {error: false}});
 })
+
+router.post("/post/new", function(req, res){
+    var params = req.body;
+    if(params.title.trim().length == 0){
+        var data = {
+            error: "Please enter a title"
+        };
+        res.render("admin/post/new", {data: data});
+    }else{
+        var now = new Date();
+        params.created_at = now;
+        params.updated_at = now;
+    
+        var data = post_md.addPost(params);
+        
+        data.then(function(result){
+            res.redirect("/admin");
+        }).catch(function(err){
+            var data = {
+                error:"Could not insert post"
+            };
+            res.render("admin/post/new",{data: data});
+        });
+    }
+
+});
+
+router.get("/post/edit/:id", function(req, res){
+    var params = req.params;
+    var id = params.id;
+
+    var data = post_md.getPostByID(id);
+    console.log(data);
+    if(data){
+        data.then(function(posts){
+            var post = posts[0];
+            var data = {
+                post: post,
+                error: false
+            };
+            res.render("admin/post/edit", {data: data});
+        }).catch(function(err){
+            var data = {
+                error: "Could not get Post by IDc"
+            };
+            res.render("admin/post/edit", {data: data});
+        });
+    }else{
+        var data = {
+            error: "Could not get Post by IDe"
+        };
+        res.render("admin/post/edit", {data: data})
+    };
+});
+
+
+router.put("/post/edit", function(req, res){
+    var params = req.body;
+
+    data = post_md.updatePost(params);
+
+    if(!data){
+        res.json({status_code: 500});
+    }else{
+        data.then(function(result){
+            res.json({status_code: 200});
+        }).catch(function(err){
+            res.json({status_code: 500});
+        });
+    }
+
+});
 
 module.exports = router;
