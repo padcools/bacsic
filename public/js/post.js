@@ -12,7 +12,7 @@ function Post(){
             $.ajax({
                 url: base_url + "/admin/post/edit",
                 type: "PUT",
-                data: parmars,
+                data: params,
                 dataType: "json",
                 success: function(res){
                     if(res && res.status_code == 200){
